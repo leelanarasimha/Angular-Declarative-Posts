@@ -1,1 +1,24 @@
-<p>posts works!</p>
+<div class="row">
+  <div class="col-md-12">
+    <h3>Posts Data</h3>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let post of posts">
+          <td>{{ post.id }}</td>
+          <td>{{ post.title }}</td>
+          <td>{{ post.description }}</td>
+          <td>{{ post.categoryId }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
