@@ -3,4 +3,5 @@ export interface IPost {
   title: string;
   categoryId: string;
   description: string;
+  categoryName?: string;
 }
