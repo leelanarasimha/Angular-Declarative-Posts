@@ -8,7 +8,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeclarativePostsComponent {
-  posts$ = this.postService.posts$;
+  posts$ = this.postService.postsWithCategory$;
 
   constructor(private postService: DeclarativePostService) {}
 }
