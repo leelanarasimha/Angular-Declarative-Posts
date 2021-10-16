@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { combineLatest, forkJoin, Subject } from 'rxjs';
+import { combineLatest, forkJoin, Subject, catchError, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IPost } from '../models/IPost';
 import { DeclarativeCategoryService } from './DeclarativeCategory.service';
@@ -11,7 +11,7 @@ import { DeclarativeCategoryService } from './DeclarativeCategory.service';
 export class DeclarativePostService {
   posts$ = this.http
     .get<{ [id: string]: IPost }>(
-      `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
+      `https://rxjsasdasdasdsa-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
       map((posts) => {
@@ -20,7 +20,8 @@ export class DeclarativePostService {
           postsData.push({ ...posts[id], id });
         }
         return postsData;
-      })
+      }),
+      catchError(this.handleError)
     );
 
   postsWithCategory$ = combineLatest([
@@ -36,7 +37,8 @@ export class DeclarativePostService {
           )?.title,
         } as IPost;
       });
-    })
+    }),
+    catchError(this.handleError)
   );
 
   private selectedPostSubject = new Subject<string>();
@@ -48,7 +50,8 @@ export class DeclarativePostService {
   ]).pipe(
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
-    })
+    }),
+    catchError(this.handleError)
   );
 
   selectPost(postId: string) {
@@ -59,4 +62,10 @@ export class DeclarativePostService {
     private http: HttpClient,
     private categoryService: DeclarativeCategoryService
   ) {}
+
+  handleError(error: Error) {
+    return throwError(() => {
+      return 'unknown error occurred. Please try again';
+    });
+  }
 }

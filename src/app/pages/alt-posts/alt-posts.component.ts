@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { IPost } from 'src/app/models/IPost';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
@@ -6,6 +6,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   selector: 'app-alt-posts',
   templateUrl: './alt-posts.component.html',
   styleUrls: ['./alt-posts.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltPostsComponent {
   posts$ = this.postService.postsWithCategory$;
