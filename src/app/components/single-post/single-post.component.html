@@ -1,1 +1,10 @@
-<p>single-post works!</p>
+<div class="row" *ngIf="post$ | async as post">
+  <div class="col-md-12">
+    <h3>Post Details</h3>
+
+    <div>Id: {{ post.id }}</div>
+    <div>Title: {{ post.title }}</div>
+    <div>Description: {{ post.description }}</div>
+    <div>Category: {{ post.categoryName }}</div>
+  </div>
+</div>
