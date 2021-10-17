@@ -11,7 +11,7 @@ import { DeclarativeCategoryService } from './DeclarativeCategory.service';
 export class DeclarativePostService {
   posts$ = this.http
     .get<{ [id: string]: IPost }>(
-      `https://rxjsasdasdasdsa-posts-default-rtdb.firebaseio.com/posts.json`
+      `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
       map((posts) => {
