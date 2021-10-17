@@ -10,6 +10,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
 })
 export class AltPostsComponent {
   posts$ = this.postService.postsWithCategory$;
+  selectedPost$ = this.postService.post$;
   constructor(private postService: DeclarativePostService) {}
 
   onSelectPost(post: IPost, event: Event) {

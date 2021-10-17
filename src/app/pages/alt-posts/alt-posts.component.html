@@ -9,6 +9,7 @@
       <a
         (click)="onSelectPost(post, $event)"
         href="#"
+        [class]="{ active: post.id === (selectedPost$ | async)?.id }"
         class="list-group-item list-group-item-action"
         *ngFor="let post of posts$ | async"
       >
