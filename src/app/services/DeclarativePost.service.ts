@@ -7,7 +7,8 @@ import {
   catchError,
   throwError,
   shareReplay,
-  share
+  share,
+  delay,
 } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IPost } from '../models/IPost';
@@ -22,6 +23,7 @@ export class DeclarativePostService {
       `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
+      delay(2000),
       map((posts) => {
         let postsData: IPost[] = [];
         for (let id in posts) {

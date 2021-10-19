@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
+import { LoaderService } from 'src/app/services/Loader.service';
 
 @Component({
   selector: 'app-declarative-posts',
@@ -9,7 +10,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   styleUrls: ['./declarative-posts.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DeclarativePostsComponent {
+export class DeclarativePostsComponent implements OnInit {
   selectedCategoryId = '';
   posts$ = this.postService.postsWithCategory$;
   categories$ = this.categoryService.categories$;
@@ -21,6 +22,9 @@ export class DeclarativePostsComponent {
     this.posts$,
     this.selectedCategoryAction$,
   ]).pipe(
+    tap((data) => {
+      this.loaderService.hideLoader();
+    }),
     map(([posts, selectedCategory]) => {
       return posts.filter((post) =>
         selectedCategory ? post.categoryId === selectedCategory : true
@@ -30,8 +34,13 @@ export class DeclarativePostsComponent {
 
   constructor(
     private postService: DeclarativePostService,
-    private categoryService: DeclarativeCategoryService
+    private categoryService: DeclarativeCategoryService,
+    private loaderService: LoaderService
   ) {}
+
+  ngOnInit() {
+    this.loaderService.showLoader();
+  }
   onCategoryChange(event: Event) {
     let selectedCategoryId = (event.target as HTMLSelectElement).value;
     this.selectedCategorySubject.next(selectedCategoryId);
