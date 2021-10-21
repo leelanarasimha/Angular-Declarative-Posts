@@ -5,13 +5,13 @@
 </div>
 <div class="row">
   <div class="col-md-4">
-    <div class="list-group">
+    <div class="list-group" *ngIf="vm$ | async as vm">
       <a
         (click)="onSelectPost(post, $event)"
         href="#"
-        [class]="{ active: post.id === (selectedPost$ | async)?.id }"
+        [class]="{ active: post.id === vm.selectedPost?.id }"
         class="list-group-item list-group-item-action"
-        *ngFor="let post of posts$ | async"
+        *ngFor="let post of vm.posts"
       >
         {{ post.title }} ({{ post.categoryName }})
       </a>

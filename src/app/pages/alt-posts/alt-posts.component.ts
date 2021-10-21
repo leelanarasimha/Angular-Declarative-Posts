@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { combineLatest, map, tap } from 'rxjs';
 import { IPost } from 'src/app/models/IPost';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
@@ -9,8 +10,23 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltPostsComponent {
-  posts$ = this.postService.postsWithCategory$;
-  selectedPost$ = this.postService.post$;
+  posts$ = this.postService.postsWithCategory$.pipe(
+    tap((posts) => {
+      posts[0].id && this.postService.selectPost(posts[0].id);
+    })
+  );
+
+  selectedPost$ = this.postService.post$.pipe(
+    tap((data) => {
+      console.log('firing selected post');
+    })
+  );
+
+  vm$ = combineLatest([this.posts$, this.selectedPost$]).pipe(
+    map(([posts, selectedPost]) => {
+      return { posts, selectedPost };
+    })
+  );
   constructor(private postService: DeclarativePostService) {}
 
   onSelectPost(post: IPost, event: Event) {
