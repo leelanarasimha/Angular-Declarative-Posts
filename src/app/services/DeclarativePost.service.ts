@@ -24,7 +24,6 @@ export class DeclarativePostService {
       `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
-      delay(2000),
       map((posts) => {
         let postsData: IPost[] = [];
         for (let id in posts) {
@@ -33,7 +32,7 @@ export class DeclarativePostService {
         return postsData;
       }),
       catchError(this.handleError),
-      share()
+      shareReplay(1)
     );
 
   postsWithCategory$ = combineLatest([
@@ -50,10 +49,11 @@ export class DeclarativePostService {
         } as IPost;
       });
     }),
+    shareReplay(1),
     catchError(this.handleError)
   );
 
-  private selectedPostSubject = new Subject<string>();
+  private selectedPostSubject = new BehaviorSubject<string>('');
   selectedPostAction$ = this.selectedPostSubject.asObservable();
 
   post$ = combineLatest([
@@ -63,6 +63,7 @@ export class DeclarativePostService {
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
+
     catchError(this.handleError)
   );
 

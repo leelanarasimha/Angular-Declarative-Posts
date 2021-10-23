@@ -19,7 +19,7 @@ export class DeclarativeCategoryService {
         }
         return categoriesData;
       }),
-      share()
+      shareReplay()
     );
   constructor(private http: HttpClient) {}
 }
