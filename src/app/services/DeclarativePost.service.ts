@@ -9,10 +9,12 @@ import {
   shareReplay,
   share,
   delay,
+  scan,
   BehaviorSubject,
+  merge,
 } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { IPost } from '../models/IPost';
+import { CRUDAction, IPost } from '../models/IPost';
 import { DeclarativeCategoryService } from './DeclarativeCategory.service';
 
 @Injectable({
@@ -52,6 +54,22 @@ export class DeclarativePostService {
     shareReplay(1),
     catchError(this.handleError)
   );
+
+  private postCRUDSubject = new Subject<CRUDAction<IPost>>();
+  postCRUDAction$ = this.postCRUDSubject.asObservable();
+
+  allPosts$ = merge(
+    this.postsWithCategory$,
+    this.postCRUDAction$.pipe(map((data) => [data.data]))
+  ).pipe(
+    scan((posts, value) => {
+      return [...posts, ...value];
+    }, [] as IPost[])
+  );
+
+  addPost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'add', data: post });
+  }
 
   private selectedPostSubject = new BehaviorSubject<string>('');
   selectedPostAction$ = this.selectedPostSubject.asObservable();

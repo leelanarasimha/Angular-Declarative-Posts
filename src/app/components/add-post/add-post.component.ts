@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
+import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
 @Component({
   selector: 'app-add-post',
@@ -16,11 +17,14 @@ export class AddPostComponent implements OnInit {
   });
 
   categories$ = this.categoryService.categories$;
-  constructor(private categoryService: DeclarativeCategoryService) {}
+  constructor(
+    private categoryService: DeclarativeCategoryService,
+    private postService: DeclarativePostService
+  ) {}
 
   ngOnInit(): void {}
 
   onAddPost() {
-    console.log(this.postForm.value);
+    this.postService.addPost(this.postForm.value);
   }
 }
