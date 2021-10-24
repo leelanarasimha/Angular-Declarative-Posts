@@ -11,10 +11,26 @@ import { AltPostsComponent } from './pages/alt-posts/alt-posts.component';
 import { SinglePostComponent } from './components/single-post/single-post.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { AddPostComponent } from './components/add-post/add-post.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, PostsComponent, HomeComponent, DeclarativePostsComponent, AltPostsComponent, SinglePostComponent, LoadingComponent, AddPostComponent],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    PostsComponent,
+    HomeComponent,
+    DeclarativePostsComponent,
+    AltPostsComponent,
+    SinglePostComponent,
+    LoadingComponent,
+    AddPostComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })
