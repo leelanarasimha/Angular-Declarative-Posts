@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
@@ -10,7 +10,8 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   styleUrls: ['./update-post.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UpdatePostComponent implements OnInit {
+export class UpdatePostComponent {
+  postId: string = '';
   postForm = new FormGroup({
     title: new FormControl(''),
     description: new FormControl(''),
@@ -20,6 +21,7 @@ export class UpdatePostComponent implements OnInit {
 
   post$ = this.postService.post$.pipe(
     tap((post) => {
+      this.postId = post?.id + '';
       this.postForm.setValue({
         title: post?.title,
         description: post?.description,
@@ -33,5 +35,11 @@ export class UpdatePostComponent implements OnInit {
     private postService: DeclarativePostService
   ) {}
 
-  ngOnInit(): void {}
+  onUpdatePost() {
+    let postDetails = {
+      ...this.postForm.value,
+      id: this.postId,
+    };
+    this.postService.updatePost(postDetails);
+  }
 }

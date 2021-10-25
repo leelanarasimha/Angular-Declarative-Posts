@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { BehaviorSubject, catchError, EMPTY, tap } from 'rxjs';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 

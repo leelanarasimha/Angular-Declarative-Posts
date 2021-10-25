@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import {
   combineLatest,
   forkJoin,
+  Observable,
   Subject,
   catchError,
   throwError,
@@ -81,6 +82,11 @@ export class DeclarativePostService {
       if (value.action === 'add') {
         return [...posts, value.data];
       }
+      if (value.action === 'update') {
+        return posts.map((post) =>
+          post.id === value.data.id ? value.data : post
+        );
+      }
     } else {
       return value;
     }
@@ -89,24 +95,37 @@ export class DeclarativePostService {
   }
 
   savePosts(postAction: CRUDAction<IPost>) {
+    let postDetails$!: Observable<IPost>;
+
     if (postAction.action === 'add') {
-      return this.addPostToServer(postAction.data).pipe(
-        concatMap((post) =>
-          this.categoryService.categories$.pipe(
-            map((categories) => {
-              return {
-                ...post,
-                categoryName: categories.find(
-                  (category) => category.id === post.categoryId
-                )?.title,
-              };
-            })
-          )
-        )
-      );
+      postDetails$ = this.addPostToServer(postAction.data);
     }
 
-    return of(postAction.data);
+    if (postAction.action === 'update') {
+      postDetails$ = this.updatePostToServer(postAction.data);
+    }
+
+    return postDetails$.pipe(
+      concatMap((post) =>
+        this.categoryService.categories$.pipe(
+          map((categories) => {
+            return {
+              ...post,
+              categoryName: categories.find(
+                (category) => category.id === post.categoryId
+              )?.title,
+            };
+          })
+        )
+      )
+    );
+  }
+
+  updatePostToServer(post: IPost) {
+    return this.http.patch<IPost>(
+      `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${post.id}.json`,
+      post
+    );
   }
 
   addPostToServer(post: IPost) {
@@ -127,6 +146,10 @@ export class DeclarativePostService {
 
   addPost(post: IPost) {
     this.postCRUDSubject.next({ action: 'add', data: post });
+  }
+
+  updatePost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'update', data: post });
   }
 
   private selectedPostSubject = new BehaviorSubject<string>('');

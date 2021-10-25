@@ -1,5 +1,5 @@
 <div *ngIf="post$ | async">
-  <form [formGroup]="postForm">
+  <form [formGroup]="postForm" (ngSubmit)="onUpdatePost()">
     <div class="my-2">
       <label for="">Title</label>
       <input type="text" class="form-control" formControlName="title" />
