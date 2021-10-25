@@ -72,7 +72,8 @@ export class DeclarativePostService {
   ).pipe(
     scan((posts, value) => {
       return this.modifyPosts(posts, value);
-    }, [] as IPost[])
+    }, [] as IPost[]),
+    shareReplay(1)
   );
 
   modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
@@ -89,7 +90,20 @@ export class DeclarativePostService {
 
   savePosts(postAction: CRUDAction<IPost>) {
     if (postAction.action === 'add') {
-      return this.addPostToServer(postAction.data);
+      return this.addPostToServer(postAction.data).pipe(
+        concatMap((post) =>
+          this.categoryService.categories$.pipe(
+            map((categories) => {
+              return {
+                ...post,
+                categoryName: categories.find(
+                  (category) => category.id === post.categoryId
+                )?.title,
+              };
+            })
+          )
+        )
+      );
     }
 
     return of(postAction.data);
@@ -118,10 +132,7 @@ export class DeclarativePostService {
   private selectedPostSubject = new BehaviorSubject<string>('');
   selectedPostAction$ = this.selectedPostSubject.asObservable();
 
-  post$ = combineLatest([
-    this.postsWithCategory$,
-    this.selectedPostAction$,
-  ]).pipe(
+  post$ = combineLatest([this.allPosts$, this.selectedPostAction$]).pipe(
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
