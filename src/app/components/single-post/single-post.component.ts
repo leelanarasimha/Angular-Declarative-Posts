@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { BehaviorSubject, catchError, EMPTY, tap } from 'rxjs';
+import { IPost } from 'src/app/models/IPost';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
 @Component({
@@ -26,5 +27,11 @@ export class SinglePostComponent {
 
   onUpdatePost() {
     this.showUpdatePost = true;
+  }
+
+  onDeletePost(post: IPost) {
+    if (confirm('R you sure you want to delete?')) {
+      this.postService.deletePost(post);
+    }
   }
 }
