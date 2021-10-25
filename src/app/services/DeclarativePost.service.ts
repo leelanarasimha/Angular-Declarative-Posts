@@ -12,6 +12,8 @@ import {
   scan,
   BehaviorSubject,
   merge,
+  concatMap,
+  of,
 } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CRUDAction, IPost } from '../models/IPost';
@@ -60,12 +62,54 @@ export class DeclarativePostService {
 
   allPosts$ = merge(
     this.postsWithCategory$,
-    this.postCRUDAction$.pipe(map((data) => [data.data]))
+    this.postCRUDAction$.pipe(
+      concatMap((postAction) =>
+        this.savePosts(postAction).pipe(
+          map((post) => ({ ...postAction, data: post }))
+        )
+      )
+    )
   ).pipe(
     scan((posts, value) => {
-      return [...posts, ...value];
+      return this.modifyPosts(posts, value);
     }, [] as IPost[])
   );
+
+  modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
+    if (!(value instanceof Array)) {
+      if (value.action === 'add') {
+        return [...posts, value.data];
+      }
+    } else {
+      return value;
+    }
+
+    return posts;
+  }
+
+  savePosts(postAction: CRUDAction<IPost>) {
+    if (postAction.action === 'add') {
+      return this.addPostToServer(postAction.data);
+    }
+
+    return of(postAction.data);
+  }
+
+  addPostToServer(post: IPost) {
+    return this.http
+      .post<{ name: string }>(
+        `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`,
+        post
+      )
+      .pipe(
+        map((id) => {
+          return {
+            ...post,
+            id: id.name,
+          };
+        })
+      );
+  }
 
   addPost(post: IPost) {
     this.postCRUDSubject.next({ action: 'add', data: post });
