@@ -3,13 +3,30 @@
     <div class="alert alert-danger">{{ errorMessage }}</div>
   </div>
 </div>
-<div class="row" *ngIf="post$ | async as post">
-  <div class="col-md-12">
-    <h3>Post Details</h3>
 
-    <div>Id: {{ post.id }}</div>
-    <div>Title: {{ post.title }}</div>
-    <div>Description: {{ post.description }}</div>
-    <div>Category: {{ post.categoryName }}</div>
+<div *ngIf="post$ | async as post">
+  <div>
+    <button class="btn btn-warning" (click)="onUpdatePost()">
+      Update Post
+    </button>
+    <button class="btn btn-warning" (click)="onDeletePost(post)">
+      Delete Post
+    </button>
+  </div>
+  <div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Post Details</h3>
+
+        <div>Id: {{ post.id }}</div>
+        <div>Title: {{ post.title }}</div>
+        <div>Description: {{ post.description }}</div>
+        <div>Category: {{ post.categoryName }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showUpdatePost">
+    <app-update-post></app-update-post>
   </div>
 </div>

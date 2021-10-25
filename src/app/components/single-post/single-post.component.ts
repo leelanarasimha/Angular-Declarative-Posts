@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, catchError, EMPTY } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, map } from 'rxjs';
+import { IPost } from 'src/app/models/IPost';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
 @Component({
@@ -9,6 +10,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SinglePostComponent {
+  showUpdatePost = false;
   errorMessageSubject = new BehaviorSubject<string>('');
   errorMessageAction$ = this.errorMessageSubject.asObservable();
   errorMessage = '';
@@ -19,4 +21,14 @@ export class SinglePostComponent {
     })
   );
   constructor(private postService: DeclarativePostService) {}
+
+  onUpdatePost() {
+    this.showUpdatePost = true;
+  }
+
+  onDeletePost(post: IPost) {
+    if (confirm('Are you sure you want to delete?')) {
+      this.postService.deletePost(post);
+    }
+  }
 }

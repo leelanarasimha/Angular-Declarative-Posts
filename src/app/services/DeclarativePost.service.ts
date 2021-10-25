@@ -2,16 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   combineLatest,
-  forkJoin,
   Subject,
   catchError,
   throwError,
   shareReplay,
-  share,
-  delay,
   scan,
   BehaviorSubject,
+  concatMap,
   merge,
+  of,
+  observable,
+  Observable,
 } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CRUDAction, IPost } from '../models/IPost';
@@ -60,24 +61,118 @@ export class DeclarativePostService {
 
   allPosts$ = merge(
     this.postsWithCategory$,
-    this.postCRUDAction$.pipe(map((data) => [data.data]))
+    this.postCRUDAction$.pipe(
+      concatMap((postAction) =>
+        this.savePosts(postAction).pipe(
+          map((post) => ({ ...postAction, data: post }))
+        )
+      )
+    )
   ).pipe(
     scan((posts, value) => {
-      return [...posts, ...value];
-    }, [] as IPost[])
+      return this.modifyPostsToArray(posts, value);
+    }, [] as IPost[]),
+    shareReplay(1)
   );
+
+  modifyPostsToArray(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
+    if (!(value instanceof Array)) {
+      if (value.action === 'add') {
+        return [...posts, value.data];
+      }
+
+      if (value.action === 'update') {
+        return posts.map((post) =>
+          post.id === value.data.id ? value.data : post
+        );
+      }
+
+      if (value.action === 'delete') {
+        return posts.filter((post) => post.id !== value.data.id);
+      }
+    } else {
+      return value;
+    }
+    return posts;
+  }
+
+  savePosts(postAction: CRUDAction<IPost>) {
+    let postDetails$!: Observable<IPost>;
+    if (postAction.action === 'add') {
+      postDetails$ = this.addPostToServer(postAction.data);
+    }
+    if (postAction.action === 'update') {
+      postDetails$ = this.updatePostToServer(postAction.data);
+    }
+    if (postAction.action === 'delete') {
+      postDetails$ = this.deletePostToServer(postAction.data).pipe(
+        map((data) => postAction.data)
+      );
+    }
+
+    return postDetails$.pipe(
+      concatMap((post) =>
+        this.categoryService.categories$.pipe(
+          map((categories) => {
+            return {
+              ...post,
+              categoryName: categories.find(
+                (category) => category.id === post.categoryId
+              )?.title,
+            };
+          })
+        )
+      )
+    );
+  }
+
+  deletePostToServer(post: IPost) {
+    return this.http.delete(
+      `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${post.id}.json`
+    );
+  }
+
+  updatePostToServer(post: IPost) {
+    let postId = post.id;
+
+    return this.http.patch<IPost>(
+      `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${postId}.json`,
+      post
+    );
+  }
+
+  addPostToServer(post: IPost) {
+    return this.http
+      .post<{ name: string }>(
+        `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`,
+        post
+      )
+      .pipe(
+        map((id) => {
+          return {
+            ...post,
+            id: id.name,
+          };
+        })
+      );
+  }
 
   addPost(post: IPost) {
     this.postCRUDSubject.next({ action: 'add', data: post });
   }
 
+  updatePost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'update', data: post });
+  }
+
+  deletePost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'delete', data: post });
+  }
+
   private selectedPostSubject = new BehaviorSubject<string>('');
   selectedPostAction$ = this.selectedPostSubject.asObservable();
 
-  post$ = combineLatest([
-    this.postsWithCategory$,
-    this.selectedPostAction$,
-  ]).pipe(
+  post$ = combineLatest([this.allPosts$, this.selectedPostAction$]).pipe(
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),

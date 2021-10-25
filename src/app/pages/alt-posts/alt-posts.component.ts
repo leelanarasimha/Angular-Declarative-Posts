@@ -32,6 +32,7 @@ export class AltPostsComponent {
 
   onSelectPost(post: IPost, event: Event) {
     event.preventDefault();
+    this.showAddPost = false;
     post.id && this.postService.selectPost(post.id);
   }
 

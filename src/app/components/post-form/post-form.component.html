@@ -1,0 +1,28 @@
+<div *ngIf="vm$ | async as vm">
+  <form [formGroup]="postForm">
+    <div class="my-2">
+      <label>Title</label>
+      <input type="text" class="form-control" formControlName="title" />
+    </div>
+    <div class="my-2">
+      <label>Description</label>
+      <textarea class="form-control" formControlName="description"></textarea>
+    </div>
+    <div class="my-2">
+      <label>Category</label>
+      <select class="form-select" formControlName="categoryId">
+        <option value="">Select category</option>
+        <option
+          [value]="category.id"
+          *ngFor="let category of categories$ | async"
+        >
+          {{ category.title }}
+        </option>
+      </select>
+    </div>
+
+    <div class="my-2">
+      <button type="submit">Add Post</button>
+    </div>
+  </form>
+</div>

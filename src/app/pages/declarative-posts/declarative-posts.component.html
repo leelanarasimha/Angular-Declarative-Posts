@@ -2,6 +2,10 @@
   <div class="col-md-12">
     <h3>Posts Data</h3>
 
+    <div>
+      <a routerLink="/declarativeposts/add">Add Post</a>
+    </div>
+
     <div class="row">
       <div class="col-md-4">
         <select class="form-select" (change)="onCategoryChange($event)">
@@ -23,6 +27,7 @@
           <th>Title</th>
           <th>Description</th>
           <th>Category</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -31,6 +36,9 @@
           <td>{{ post.title }}</td>
           <td>{{ post.description }}</td>
           <td>{{ post.categoryName }}</td>
+          <td>
+            <a [routerLink]="['/declarativeposts/edit', post.id]">Update Post</a>
+          </td>
         </tr>
       </tbody>
     </table>
