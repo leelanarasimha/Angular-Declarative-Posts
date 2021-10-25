@@ -5,6 +5,9 @@
 </div>
 <div class="row" *ngIf="post$ | async as post">
   <div class="col-md-12">
+    <button class="btn btn-warning" (click)="onUpdatePost()">
+      Update Post
+    </button>
     <h3>Post Details</h3>
 
     <div>Id: {{ post.id }}</div>
@@ -12,4 +15,6 @@
     <div>Description: {{ post.description }}</div>
     <div>Category: {{ post.categoryName }}</div>
   </div>
+
+  <app-update-post *ngIf="showUpdatePost"></app-update-post>
 </div>

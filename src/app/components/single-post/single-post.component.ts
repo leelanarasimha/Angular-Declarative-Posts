@@ -9,6 +9,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SinglePostComponent {
+  showUpdatePost = false;
   errorMessageSubject = new BehaviorSubject<string>('');
   errorMessageAction$ = this.errorMessageSubject.asObservable();
   errorMessage = '';
@@ -19,4 +20,8 @@ export class SinglePostComponent {
     })
   );
   constructor(private postService: DeclarativePostService) {}
+
+  onUpdatePost() {
+    this.showUpdatePost = true;
+  }
 }
