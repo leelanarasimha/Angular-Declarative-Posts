@@ -4,6 +4,16 @@
   <app-loading *ngIf="showLoader"></app-loading>
 </div>
 
+<div *ngIf="successMessage$ | async as successMessage">
+  <div class="alert alert-success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+</div>
+
+<div *ngIf="errorMessage$ | async as errorMessage">
+  <div class="alert alert-success" *ngIf="errorMessage">{{ errorMessage }}</div>
+</div>
+
 <div class="container">
   <div class="row">
     <div class="col-md-12">

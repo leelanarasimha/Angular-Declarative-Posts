@@ -1,5 +1,6 @@
+<div *ngIf="postComplete$ | async"></div>
 <div *ngIf="vm$ | async as vm">
-  <form [formGroup]="postForm">
+  <form [formGroup]="postForm" (ngSubmit)="onPostSubmit()">
     <div class="my-2">
       <label>Title</label>
       <input type="text" class="form-control" formControlName="title" />

@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { BehaviorSubject, combineLatest, map, Subject, tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 import { LoaderService } from 'src/app/services/Loader.service';
+import { NotificationService } from 'src/app/services/Notification.service';
 
 @Component({
   selector: 'app-declarative-posts',
@@ -12,7 +14,7 @@ import { LoaderService } from 'src/app/services/Loader.service';
 })
 export class DeclarativePostsComponent implements OnInit {
   selectedCategoryId = '';
-  posts$ = this.postService.postsWithCategory$;
+  posts$ = this.postService.allPosts$;
   categories$ = this.categoryService.categories$;
 
   selectedCategorySubject = new BehaviorSubject<string>('');
@@ -35,7 +37,8 @@ export class DeclarativePostsComponent implements OnInit {
   constructor(
     private postService: DeclarativePostService,
     private categoryService: DeclarativeCategoryService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private router: Router
   ) {}
 
   ngOnInit() {

@@ -12,11 +12,13 @@ import {
   merge,
   of,
   observable,
+  tap,
   Observable,
 } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CRUDAction, IPost } from '../models/IPost';
 import { DeclarativeCategoryService } from './DeclarativeCategory.service';
+import { NotificationService } from './Notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -59,12 +61,21 @@ export class DeclarativePostService {
   private postCRUDSubject = new Subject<CRUDAction<IPost>>();
   postCRUDAction$ = this.postCRUDSubject.asObservable();
 
+  private postCompleteSubject = new Subject<string>();
+  postCompleteAction$ = this.postCompleteSubject.asObservable();
+
+  postComplete() {
+    this.postCompleteSubject.next('');
+  }
+
   allPosts$ = merge(
     this.postsWithCategory$,
     this.postCRUDAction$.pipe(
       concatMap((postAction) =>
         this.savePosts(postAction).pipe(
-          map((post) => ({ ...postAction, data: post }))
+          map((post) => {
+            return { ...postAction, data: post };
+          })
         )
       )
     )
@@ -127,18 +138,34 @@ export class DeclarativePostService {
   }
 
   deletePostToServer(post: IPost) {
-    return this.http.delete(
-      `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${post.id}.json`
-    );
+    return this.http
+      .delete(
+        `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${post.id}.json`
+      )
+      .pipe(
+        tap((data) => {
+          this.postComplete();
+          this.notificationService.setSuccessMessage(
+            'Post Deleted Successfully'
+          );
+        })
+      );
   }
 
   updatePostToServer(post: IPost) {
     let postId = post.id;
 
-    return this.http.patch<IPost>(
-      `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${postId}.json`,
-      post
-    );
+    return this.http
+      .patch<IPost>(
+        `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${postId}.json`,
+        post
+      )
+      .pipe(
+        tap((data) => {
+          this.postComplete();
+          this.notificationService.setErrorMessage('Post Updated Successfully');
+        })
+      );
   }
 
   addPostToServer(post: IPost) {
@@ -148,6 +175,12 @@ export class DeclarativePostService {
         post
       )
       .pipe(
+        tap((data) => {
+          this.postComplete();
+          this.notificationService.setSuccessMessage(
+            'Post Addedd Successfully'
+          );
+        }),
         map((id) => {
           return {
             ...post,
@@ -186,7 +219,8 @@ export class DeclarativePostService {
 
   constructor(
     private http: HttpClient,
-    private categoryService: DeclarativeCategoryService
+    private categoryService: DeclarativeCategoryService,
+    private notificationService: NotificationService
   ) {}
 
   handleError(error: Error) {

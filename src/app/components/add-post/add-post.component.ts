@@ -17,6 +17,7 @@ export class AddPostComponent implements OnInit {
   });
 
   categories$ = this.categoryService.categories$;
+
   constructor(
     private categoryService: DeclarativeCategoryService,
     private postService: DeclarativePostService
