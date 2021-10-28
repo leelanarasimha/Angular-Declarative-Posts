@@ -11,6 +11,7 @@ import {
   share,
   delay,
   scan,
+  tap,
   BehaviorSubject,
   merge,
   concatMap,
@@ -19,6 +20,7 @@ import {
 import { map } from 'rxjs/operators';
 import { CRUDAction, IPost } from '../models/IPost';
 import { DeclarativeCategoryService } from './DeclarativeCategory.service';
+import { NotificationService } from './Notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -102,15 +104,30 @@ export class DeclarativePostService {
     let postDetails$!: Observable<IPost>;
 
     if (postAction.action === 'add') {
-      postDetails$ = this.addPostToServer(postAction.data);
+      postDetails$ = this.addPostToServer(postAction.data).pipe(
+        tap((post) => {
+          this.notificationService.setSuccessMessage('Post Added Successfully');
+        })
+      );
     }
 
     if (postAction.action === 'update') {
-      postDetails$ = this.updatePostToServer(postAction.data);
+      postDetails$ = this.updatePostToServer(postAction.data).pipe(
+        tap((post) => {
+          this.notificationService.setSuccessMessage(
+            'Post Updated Successfully'
+          );
+        })
+      );
     }
 
     if (postAction.action === 'delete') {
       return this.deletePostToServer(postAction.data).pipe(
+        tap((post) => {
+          this.notificationService.setSuccessMessage(
+            'Post Deleted Successfully'
+          );
+        }),
         map((post) => postAction.data)
       );
     }
@@ -189,7 +206,8 @@ export class DeclarativePostService {
 
   constructor(
     private http: HttpClient,
-    private categoryService: DeclarativeCategoryService
+    private categoryService: DeclarativeCategoryService,
+    private notificationService: NotificationService
   ) {}
 
   handleError(error: Error) {
