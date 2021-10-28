@@ -22,7 +22,9 @@
     </div>
 
     <div>
-      <button type="submit" class="btn btn-primary">Add Post</button>
+      <button type="submit" class="btn btn-primary">
+        {{ postId ? "Update Post" : "Add Post" }}
+      </button>
     </div>
   </form>
 </div>

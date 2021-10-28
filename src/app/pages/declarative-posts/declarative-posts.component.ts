@@ -12,7 +12,7 @@ import { LoaderService } from 'src/app/services/Loader.service';
 })
 export class DeclarativePostsComponent implements OnInit {
   selectedCategoryId = '';
-  posts$ = this.postService.postsWithCategory$;
+  posts$ = this.postService.allPosts$;
   categories$ = this.categoryService.categories$;
 
   selectedCategorySubject = new BehaviorSubject<string>('');
