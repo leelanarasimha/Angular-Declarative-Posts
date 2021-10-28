@@ -1,16 +1,16 @@
-<div>
-  <form>
+<div *ngIf="vm$ | async as vm">
+  <form [formGroup]="postForm" (ngSubmit)="onPostSubmit()">
     <div class="my-2">
       <label>Title</label>
-      <input type="text" class="form-control" />
+      <input type="text" class="form-control" formControlName="title" />
     </div>
     <div class="my-2">
       <label>Description</label>
-      <textarea class="form-control"></textarea>
+      <textarea class="form-control" formControlName="description"></textarea>
     </div>
     <div class="my-2">
       <label>Category</label>
-      <select class="form-select">
+      <select class="form-select" formControlName="categoryId">
         <option value="">Select Category</option>
         <option
           [value]="category.id"
