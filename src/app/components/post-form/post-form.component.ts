@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { combineLatest, map, startWith, tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
+import { NotificationService } from 'src/app/services/Notification.service';
 
 @Component({
   selector: 'app-post-form',
@@ -41,13 +42,24 @@ export class PostFormComponent implements OnInit {
     })
   );
 
+  notification$ = this.postService.postCRUDCompleteAction$.pipe(
+    startWith(false),
+    tap((message) => {
+      if (message) {
+        this.router.navigateByUrl('/declarativeposts');
+      }
+    })
+  );
+
   categories$ = this.categoryService.categories$;
 
-  vm$ = combineLatest([this.selectedPostId, this.post$]);
+  vm$ = combineLatest([this.selectedPostId, this.post$, this.notification$]);
 
   constructor(
     private categoryService: DeclarativeCategoryService,
     private route: ActivatedRoute,
+    private notificationService: NotificationService,
+    private router: Router,
     private postService: DeclarativePostService
   ) {}
 
