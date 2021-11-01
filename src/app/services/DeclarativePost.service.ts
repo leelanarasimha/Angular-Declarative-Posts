@@ -63,6 +63,9 @@ export class DeclarativePostService {
   private postCRUDSubject = new Subject<CRUDAction<IPost>>();
   postCRUDAction$ = this.postCRUDSubject.asObservable();
 
+  private postCRUDCompleteSubject = new Subject<boolean>();
+  postCRUDCompleteAction$ = this.postCRUDCompleteSubject.asObservable();
+
   allPosts$ = merge(
     this.postsWithCategory$,
     this.postCRUDAction$.pipe(
@@ -106,7 +109,9 @@ export class DeclarativePostService {
     if (postAction.action === 'add') {
       postDetails$ = this.addPostToServer(postAction.data).pipe(
         tap((post) => {
+
           this.notificationService.setSuccessMessage('Post Added Successfully');
+          this.postCRUDCompleteSubject.next(true);
         })
       );
     }
@@ -117,6 +122,7 @@ export class DeclarativePostService {
           this.notificationService.setSuccessMessage(
             'Post Updated Successfully'
           );
+          this.postCRUDCompleteSubject.next(true);
         })
       );
     }
@@ -127,6 +133,7 @@ export class DeclarativePostService {
           this.notificationService.setSuccessMessage(
             'Post Deleted Successfully'
           );
+          this.postCRUDCompleteSubject.next(true);
         }),
         map((post) => postAction.data)
       );
