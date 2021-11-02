@@ -79,7 +79,8 @@ export class DeclarativePostService {
     scan((posts, value) => {
       return this.modifyPosts(posts, value);
     }, [] as IPost[]),
-    shareReplay(1)
+    shareReplay(1),
+    catchError(this.handleError)
   );
 
   modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
@@ -109,10 +110,10 @@ export class DeclarativePostService {
     if (postAction.action === 'add') {
       postDetails$ = this.addPostToServer(postAction.data).pipe(
         tap((post) => {
-
           this.notificationService.setSuccessMessage('Post Added Successfully');
           this.postCRUDCompleteSubject.next(true);
-        })
+        }),
+        catchError(this.handleError)
       );
     }
 
@@ -123,7 +124,8 @@ export class DeclarativePostService {
             'Post Updated Successfully'
           );
           this.postCRUDCompleteSubject.next(true);
-        })
+        }),
+        catchError(this.handleError)
       );
     }
 
@@ -135,7 +137,8 @@ export class DeclarativePostService {
           );
           this.postCRUDCompleteSubject.next(true);
         }),
-        map((post) => postAction.data)
+        map((post) => postAction.data),
+        catchError(this.handleError)
       );
     }
 

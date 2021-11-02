@@ -14,16 +14,20 @@ export class AppComponent {
   showLoader$ = this.loaderService.loadingAction$;
   successMessage$ = this.notificationService.successMessageAction$.pipe(
     tap((message) => {
-      setTimeout(() => {
-        this.notificationService.clearAllMessages();
-      }, 5000);
+      if (message) {
+        setTimeout(() => {
+          this.notificationService.clearAllMessages();
+        }, 5000);
+      }
     })
   );
   errorMessage$ = this.notificationService.errorMessageAction$.pipe(
     tap((message) => {
+      if (message) {
       setTimeout(() => {
         this.notificationService.clearAllMessages();
       }, 5000);
+    }
     })
   );
 
